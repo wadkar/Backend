@@ -1,13 +1,5 @@
 from django.http import HttpResponse
 from django.utils.text import slugify
-def create_connection(db_file):
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-    except Error as e:
-        print(e)
-    return conn
-
 # Create your views here.
 def main(request):
     if request.method=='POST':

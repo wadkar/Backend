@@ -8,7 +8,7 @@ import glob, os
 
 
 def get_infected_users_at_timestamp(timestamp_string):
-    data_frame = pd.read_csv('LocationData/'+timestamp_string,header=None,names=["UUID","Status","Lat","Lng"])
+    data_frame = pd.read_csv('LocationData/'+timestamp_string,header=None,names=["UUID","Status","Lat","Lng"],memory_map=True)
 
     #print(data_frame)
 

@@ -23,7 +23,8 @@ from home import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home/', include('home.urls', namespace='home')),
-    url(r'^api/', include('reportLocation.urls', namespace='reportLocation'))
+    url(r'^api/', include('reportLocation.urls', namespace='reportLocation')),
+    url(r'^api_check/', include('checkInfected.urls', namespace='checkInfected'))
 ]
 
 if settings.DEBUG:
