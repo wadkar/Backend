@@ -3,13 +3,12 @@ import pandas as pd
 import geopandas as gpd
 from geopandas import GeoDataFrame, GeoSeries, overlay
 from shapely.geometry import Point, Polygon
-import matplotlib.pyplot as plt
 import glob, os
 
 
 
 def get_infected_users_at_timestamp(timestamp_string):
-    data_frame = pd.read_csv(timestamp_string,header=None,names=["UUID","Status","Lat","Lng"])
+    data_frame = pd.read_csv('LocationData/'+timestamp_string,header=None,names=["UUID","Status","Lat","Lng"])
 
     #print(data_frame)
 
@@ -50,4 +49,6 @@ def get_infected_users_at_timestamp(timestamp_string):
 
 with open('InfectedUsers.csv','a+') as infected_file:
     for timestamp_file in glob.glob("LocationData/*.csv"):
-        get_infected_users_at_timestamp(timestamp_file).to_csv(infected_file, header=None)
+        inf=get_infected_users_at_timestamp(timestamp_file.replace('LocationData/',''))
+        print(inf)
+        inf.to_csv(infected_file, header=None)
