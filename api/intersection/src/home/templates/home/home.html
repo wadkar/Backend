@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+
+
+  <div class="container-fluid p-0">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="embed-responsive embed-responsive-21by9">
+          <iframe class="embed-responsive-item" src="http://arcg.is/1mq4L1"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form action="results/" method="post">
+    {% csrf_token %}
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3> Who are you filling this information for? </h3>
+          <div class="form-check">
+            <input required class="form-check-input" type="radio" name="who_filling" value="myself">
+            <label class="form-check-label" for="Myself">
+              a. Myself
+            </label>
+            <br>
+            <input required class="form-check-input" type="radio" name="who_filling">
+            <label class="form-check-label" for="Someone else">
+              b. Someone else
+            </label>
+          </div>
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3> Kindly mention your gender? </h3>
+          <div class="form-check">
+            <input required class="form-check-input" type="radio" name="gender" value="Male">
+            <label class="form-check-label" for="Male">
+              a. Male
+            </label>
+            <br>
+            <input required class="form-check-input" type="radio" name="gender" value="Female">
+            <label class="form-check-label" for="Female">
+              b. Female
+            </label>
+            <br>
+            <input required class="form-check-input" type="radio" name="gender" value="Other">
+            <label class="form-check-label" for="Other">
+              c. Other
+            </label>
+          </div>
+        </div>
+        <div class="col-lg-6 mt-4">
+          <h3>What is your age?</h3>
+          <input required  name="age" type="text" class="form-control" placeholder="Age">
+        </div>
+        <div class="col-lg-6 mt-4">
+          <h3>What is your height (in cms)?</h3>
+          <input required name="height" type="text" class="form-control" placeholder="Height">
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3>Have you come in contact with someone who is displaying flu/fever symptoms?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="contact" value="Yes">
+            <label class="form-check-label" for="inlineRadio1">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="contact" value="no">
+            <label class="form-check-label" for="inlineRadio2">No</label>
+          </div>
+
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3>Do you have any International Travel history in past 21 days?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="international" value="Yes">
+            <label class="form-check-label" for="inlineRadio1">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="international" value="no">
+            <label class="form-check-label" for="inlineRadio2">No</label>
+          </div>
+
+        </div>
+
+
+        <div class="col-lg-12 mt-4">
+          <h3>Do you have any domestic Travel history in past 21 days?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="domestic" value="Yes">
+            <label class="form-check-label" for="inlineRadio1">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="domestic" value="no">
+            <label class="form-check-label" for="inlineRadio2">No</label>
+          </div>
+
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3>Do you have a past history of illness with any of the following?</h3>
+          <div class="form-check form-check-inline">
+            <input name="kidney" class="form-check-input" type="checkbox" value="Yes">
+            <label class="form-check-label" for="inlineCheckbox1">Kidney Disease</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input name="heart" class="form-check-input" type="checkbox" value="Yes">
+            <label class="form-check-label" for="inlineCheckbox2">Heart Disease</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input name="lung" class="form-check-input" type="checkbox" value="Yes">
+            <label class="form-check-label" for="inlineCheckbox3">Lung Disease</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input name="stroke" class="form-check-input" type="checkbox" value="Yes">
+            <label class="form-check-label" for="inlineCheckbox3">Stroke</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input name="diabetes" class="form-check-input" type="checkbox" value="Yes">
+            <label class="form-check-label" for="inlineCheckbox3">Diabetes</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input name="hypertension" class="form-check-input" type="checkbox" value="Yes">
+            <label class="form-check-label" for="inlineCheckbox3">Hypertension</label>
+          </div>
+
+
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3>Are you immunocompromised due to any conditions like organ transplant or HIV?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="immunocompromised" value="Yes">
+            <label class="form-check-label" for="inlineRadio1">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="immunocompromised" value="no">
+            <label class="form-check-label" for="inlineRadio2">No</label>
+          </div>
+
+
+        <div class="col-lg-12 mt-4">
+          <h3>Do you have Fever?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="fevercheck" value="1">
+            <label class="form-check-label" for="inlineRadio1">a. Fever between 98.6 and 100.4 deg F</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="fevercheck" value="2">
+            <label class="form-check-label" for="inlineRadio2">b. Fever between 100.4 and 104 deg F</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="fevercheck" value="3">
+            <label class="form-check-label" for="inlineRadio3">c. Fever that comes and goes</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="fevercheck" value="4">
+            <label class="form-check-label" for="inlineRadio3">d. Fever, temperature not measured</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="fevercheck" value="5">
+            <label class="form-check-label" for="inlineRadio3"><b>e. I don't have fever</b></label>
+          </div>
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3>Do you have Cough?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="coughcheck" value="Yes">
+            <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="coughcheck" value="No">
+            <label class="form-check-label" for="inlineRadio2">b. No</label>
+          </div>
+
+        </div>
+
+        <div class="col-lg-12 mt-4">
+          <h3>Are you facing any Shortness of breath?</h3>
+          <div class="form-check form-check-inline">
+            <input required class="form-check-input" type="radio" name="shortnesscheck" value="1">
+            <label class="form-check-label" for="inlineRadio1">a. Shortness of breath accompanied with chest pain, light headedness
+              and pale lips</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input required class="form-check-input" type="radio" name="shortnesscheck" value="2">
+              <label class="form-check-label" for="inlineRadio2">b. Shortness of breath accompanied by sweating of palms, heart racing
+                and dilation of pupils</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="shortnesscheck" value="3">
+                <label class="form-check-label" for="inlineRadio2">c. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Are you feeling tired or experiencing fatigue?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="fatigue" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="fatigue" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>ARE YOU EXPERIENCING A SUDDEN LOSS OF TASTE AND SMELL?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="taste" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="taste" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Are you having a headache?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="headache" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="headache" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Are you having muscle pain?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="muscle" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="muscle" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Are you experiencing chill?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="chill" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="chill" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Are you experiencing nausea/vomiting?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="nausea" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="nausea" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Are you experiencing nasal congestion?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="nasal" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="nasal" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+            <div class="col-lg-12 mt-4">
+              <h3>Are you experiencing a sore throat?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="throat" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="throat" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+            <div class="col-lg-12 mt-4">
+              <h3>Are you experiencing diarrhea?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="diarrhea" value="Yes">
+                <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="diarrhea" value="No">
+                <label class="form-check-label" for="inlineRadio2">b. No</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>For how long have you been experiencing these symptoms?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="time" value="1">
+                <label class="form-check-label" for="inlineRadio1">a. 0-12 hours</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="time" value="2">
+                <label class="form-check-label" for="inlineRadio2">b. 12-24 hours</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="time" value="3">
+                <label class="form-check-label" for="inlineRadio2">c. 24-48 hours</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="time" value="4">
+                <label class="form-check-label" for="inlineRadio2">d. >48 hours</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>How have your symptoms progressed over the last 48 hours?</h3>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="symp" value="1">
+                <label class="form-check-label" for="inlineRadio1">a. Improved</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="symp" value="2">
+                <label class="form-check-label" for="inlineRadio2">b. No Change</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="symp" value="3">
+                <label class="form-check-label" for="inlineRadio2">c. Worsened</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input required class="form-check-input" type="radio" name="worse" value="4">
+                <label class="form-check-label" for="inlineRadio2">d. Worsened considerably</label>
+              </div>
+
+            </div>
+
+            <div class="col-lg-12 mt-4">
+              <h3>Do you want us to send you alerts to check your symptoms every 48
+                hours?</h3>
+                <div class="form-check form-check-inline">
+                  <input required class="form-check-input" type="radio" name="alert" value="Yes">
+                  <label class="form-check-label" for="inlineRadio1">a. Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input required class="form-check-input" type="radio" name="alert" value="No">
+                  <label class="form-check-label" for="inlineRadio2">b. No</label>
+                </div>
+
+              </div>
+            </div>
+            <input required type="submit" name="formSubmit" value="Submit" />
+          </div>
+          </form>
+
+          <!-- Optional JavaScript -->
+          <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+          <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+          <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+          <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
+</body>
+
+</html>

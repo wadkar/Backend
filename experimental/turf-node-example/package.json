@@ -1,0 +1,24 @@
+{
+  "name": "turf-node-example",
+  "version": "2.0.0",
+  "description": "an example of using turf with node to run a simple processing script",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "turf",
+    "node",
+    "example",
+    "turfjs",
+    "gis",
+    "geospatial"
+  ],
+  "author": "Tom MacWright",
+  "license": "ISC",
+  "dependencies": {
+    "@turf/turf": "^4.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Turfjs/turf-node-example.git"
+  }
+}
