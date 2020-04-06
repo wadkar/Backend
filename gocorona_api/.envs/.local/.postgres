@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=gocorona_api
+POSTGRES_USER=mEAqILsgJuYEbnqCZqfeRAddyfXlwJlS
+POSTGRES_PASSWORD=kirA9TMXIEAz4ok6HxdJmloJJpFEEmsbwekLHjTRHRh4At7ailYjDVWordcXMUVm
