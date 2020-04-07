@@ -1,0 +1,32 @@
+{
+    "cookiecutter": {
+        "project_name": "GoCorona API",
+        "project_slug": "gocorona_api",
+        "description": "GoCorona Covid-19 Hotspot Detection and Rapid Response",
+        "author_name": "GoCorona Authors",
+        "domain_name": "dev.gocorona.wadkar.net",
+        "email": "gocorona.email@wadkar.net",
+        "version": "0.1.0",
+        "open_source_license": "GPLv3",
+        "timezone": "Asia/Kolkata",
+        "windows": "y",
+        "use_pycharm": "y",
+        "use_docker": "y",
+        "postgresql_version": "11.3",
+        "js_task_runner": "Gulp",
+        "cloud_provider": "AWS",
+        "mail_service": "Mailgun",
+        "use_drf": "y",
+        "custom_bootstrap_compilation": "y",
+        "use_compressor": "y",
+        "use_celery": "y",
+        "use_mailhog": "y",
+        "use_sentry": "y",
+        "use_whitenoise": "y",
+        "use_heroku": "n",
+        "ci_tool": "Gitlab",
+        "keep_local_envs_in_vcs": "y",
+        "debug": "n",
+        "_template": "https://github.com/pydanny/cookiecutter-django"
+    }
+}

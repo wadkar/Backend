@@ -62,7 +62,7 @@ services:
     image: gocorona_api_production_flower
     command: /start-flower
 
-
+  
   awscli:
     build:
       context: .
