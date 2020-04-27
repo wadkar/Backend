@@ -25,18 +25,23 @@ There may arise some problems\errors while installing geopandas, check if versio
 
 In this case download the latest, compatible GDAL .whl file (Ex. if your OS is windows 64 bit, and if your python version is 3.6, download GDAL-3.0.4-cp36-cp36m-win_amd64.whl) from this website:
 [https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal]
+
 Run :
+
 `pip install /path/to/GDAL-***.whl`
 
 Repeat the above steps for Fiona:
+
 [https://www.lfd.uci.edu/~gohlke/pythonlibs/#fiona]
 
 Now Run:
+
 `pip install geopandas`
 
 ### 1.2. Setup postgres database
 
 Install in one go : `cd ./containers/postgres && ./start_postgres.sh`
+
 Perequisites: Should have docker installed in the system, should know/set the db password
 
 #### Manual Installation (In case docker install fails, or you want to view the database using PgAdmin GUI )
@@ -47,14 +52,22 @@ Download the package from this website:
 Click on the download the installer and click on the latest version for your OS to download.
 
 Run the installer. Select all the packages to be installed.
+
 While the installer runs it asks for a password setup for the superuser: postgres
-Set the password using `export DB_PASSWORD=your_password`. Default we are using `spotcorona`. Do not use this in a production environment
+
+Default we are using `spotcorona`. Do not use this in a production environment
+
 Complete the installation
 
-Open pgAdmin from start menu
+Open pgAdmin from start menu.
+
 Once it opens in the web browser, Authorize with your password.
-In the browser panel on the left, right click on Databases and create a new database with the name: corona_project
+
+In the browser panel on the left, right click on Databases and create a new database with the name: corona_project.
+
 You would not see any tables yet because they havent been populated from the django project.
+
+Export the password using `export DB_PASSWORD=your_password` for the next step.
 
 ### 1.3. Setup Django Server
 
@@ -76,6 +89,7 @@ Install in one go : `cd ./containers/server && ./start_server.sh`
 ## 2. API
 
 The reference doc for the Backend API is [https://github.com/GoCorona-org/Backend/blob/master/docs/swagger.yaml]( swagger.yaml in docs folder)
+
 Copy paste the yaml files into [https://editor.swagger.io/] to view the api.
 
 ## 3.Release Notes
