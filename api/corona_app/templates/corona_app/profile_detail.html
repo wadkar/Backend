@@ -1,0 +1,13 @@
+{% load rest_framework %}
+
+<html><body>
+
+<h1>Medical Map Form</h1>
+
+<form action="{% url 'corona_app:medmap_list'%}" method="POST">
+    {% csrf_token %}
+    {% render_form serializer %}
+    <input type="submit" value="Save">
+</form>
+
+</body></html>

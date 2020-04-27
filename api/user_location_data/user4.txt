@@ -1,0 +1,10 @@
+{  "id" : "p4",
+
+   "location_history" : [ 
+
+       { "timeslot": "00.00.01.15.2020", "lat" : "12.3456","long" : "13.456", "status" : "positive"},
+
+       { "timeslot": "00.10.01.15.2020", "lat" : "13.3456","long" : "14.456", "status" : "positive"}
+       ]
+
+}

@@ -1,0 +1,13 @@
+{  "id" : "p3",
+
+   "location_history" : [ 
+
+       { "timeslot": "00.00.01.15.2020", "lat" : "14.6","long" : "18.56", "status" : "unknown"},
+
+       { "timeslot": "00.10.01.15.2020", "lat" : "15.6","long" : "18.56", "status" : "unknown"},
+
+       { "timeslot": "00.20.01.15.2020", "lat" : "15.6","long" : "18.56", "status" : "unknown"}
+
+       ]
+
+}
