@@ -4,8 +4,8 @@
 
 ### 1.1. Setup Prerequisites
 
-Install python3 and docker
-Install python3 dependencies in one go from root folder : `cd ./api && pip3 install --no-cache-dir -r requirements.txt`
+1. Install python3 and docker
+2. Install python3 dependencies in one go from root folder : `cd ./api && pip3 install --no-cache-dir -r requirements.txt`
 
 #### Manual Installation (In case the previous step fails on your system)
 
