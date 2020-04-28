@@ -1,0 +1,16 @@
+
+{% block content %}
+
+
+<h1>Medical Map Form</h1>
+
+ <!-- action="url 'corona_app:medmap_color' " method="POST" -->
+
+<form method="POST">
+    {% csrf_token %}}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+
+
+{% endblock %}

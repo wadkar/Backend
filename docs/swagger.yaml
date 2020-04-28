@@ -1,544 +1,1252 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  description: "This is a sample spotcorona server"
-  version: "1.0.0"
-  title: "SpotCorona api"
-  termsOfService: "http://swagger.io/terms/"
+  description: This is a sample spotcorona server
+  version: 1.0.0
+  title: SpotCorona api
+  termsOfService: 'http://swagger.io/terms/'
   contact:
-    email: "apiteam@spotcorona.org"
+    email: apiteam@spotcorona.org
   license:
-    name: "GPLv3"
-    url: "https://www.gnu.org/licenses/gpl-3.0.en.html"
-host: "api.spotcorona.org"
-basePath: "/v1"
+    name: GPLv3
+    url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+host: api.spotcorona.org
+basePath: /v1
 tags:
-- name: "Intersection"
-  description: "Everything about Intersection Calculator Endpoint"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "Medical"
-  description: "Everything about medical hisory endpoint"
-- name: "Travel History"
-  description: "Everything related to travel history"
-  externalDocs:
-    description: "Find out more about our group"
-    url: "http://swagger.io"
-- name: "User"
-  description: "Everything related to user's personal details"
-  externalDocs:
-    description: "Find out more about our group"
-    url: "http://swagger.io"
+  - name: Intersection
+    description: Everything about Intersection Calculator Endpoint
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: Medical
+    description: Everything about medical hisory endpoint
+  # - name: Travel History
+  #   description: Everything related to travel history
+  #   externalDocs:
+  #     description: Find out more about our group
+  #     url: 'http://swagger.io'
+  # - name: User
+  #   description: Everything related to user's personal details
+  #   externalDocs:
+  #     description: Find out more about our group
+  #     url: 'http://swagger.io'
 schemes:
-- "https"
-- "http"
+  - https
+  - http
 paths:
   /report:
     post:
       tags:
-      - "Intersection"
-      summary: "Add a set of location history points to the database"
-      description: ""
-      operationId: "reportLocation"
+        - Intersection
+      summary: Add a set of location history points to the database
+      description: ''
+      operationId: reportLocation
       consumes:
-      - "application/json"
+        - application/json
       produces:
-      - "application/json"
+        - application/json
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Location history object that needs to be added to the database"
-        required: true
-        schema:
-          $ref: "#/definitions/LocationHistory"
+        - in: body
+          name: Location Data Upload
+          description: Location history data that needs to be added to the database
+          required: true
+          schema:
+            type: object
+            properties:
+              uuid:
+                type: string
+              location_history:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    timeslot:
+                      type: string
+                      format: date-time
+                    status:
+                      type: string
+                      enum:
+                        - unknown
+                        - positive
+                    lat:
+                      type: number
+                      format: float
+                    long:
+                      type: number
+                      format: float
       responses:
-        405:
-          description: "Invalid input"
+        '201':
+          description: Multiple Objects with uuid created
+        '400':
+          description: Invalid input
       security:
-      - spotcorona_auth:
-        - "write:spotcorona_api"
-        - "read:spotcorona_api"
-  /map/{status}:
+        - spotcorona_auth:
+            - 'write:spotcorona_api'
+            - 'read:spotcorona_api'
     get:
       tags:
-      - "Intersection"
-      summary: "Get last known coordinates of all users of a particular status"
-      description: "Multiple status values can be provided with comma separated strings"
-      operationId: "findUsersByStatus"
+        - Intersection
+      summary: >-
+        This request enables the calculation of the intersection algo in the
+        backend on all the values existing in the location history database
+      operationId: initiateIntersectionCalculation
       produces:
-      - "application/json"
-      parameters:
-      - name: "status"
-        in: "path"
-        required: true
-        type: "string"
-        description: "Patient status to be queried"
-        enum:
-          - "unknown"
-          - "exposed"
-          - "positive"
+        - application/json
       responses:
-        200:
-          description: "successful operation"
+        '201':
+          description: Intersection Calculation Done 
+  '/map/{status}':
+    get:
+      tags:
+        - Intersection
+      summary: Get last known coordinates of all users of a particular status
+      operationId: findUsersByStatus
+      produces:
+        - application/json
+      parameters:
+        - name: status
+          in: path
+          required: true
+          type: string
+          description: Patient status to be queried
+          enum:
+            - exposed
+            - positive
+      responses:
+        '200':
+          description: successful operation
           schema:
-            type: "array"
+            type: array
             items:
-              $ref: "#/definitions/Point"
-        400:
-          description: "Invalid status value"
+              type: "object"
+              properties:
+                uuid:
+                  $ref: '#/definitions/CoronaApp/properties/uuid'
+                timeslot:
+                  $ref: '#/definitions/CoronaApp/properties/timeslot'
+                latitude:
+                  $ref: '#/definitions/CoronaApp/properties/latitude'
+                longitude:
+                  $ref: '#/definitions/CoronaApp/properties/longitude'
+        '400':
+          description: Invalid status value
       security:
-      - spotcorona_auth:
-        - "read:spotcorona_api"
-  /amIExposed/{user_location_id}:
+        - spotcorona_auth:
+            - 'read:spotcorona_api'
+  '/amIExposed/{user_location_id}':
     get:
       tags:
-      - "Intersection"
-      summary: "Find if the user with the queried id is exposed"
-      description: "Returns status and degree of exposure"
-      operationId: "getAmIExposedById"
+        - Intersection
+      summary: Find if the user with the queried id is exposed
+      description: Returns status and degree of exposure
+      operationId: getAmIExposedById
       produces:
-      - "application/json"
+        - application/json
       parameters:
-      - name: "user_location_id"
-        in: "path"
-        description: "ID of user to return"
-        required: true
-        type: "integer"
-        format: "int64"
+        - name: user_location_id
+          in: path
+          description: ID of user to return - UUID
+          required: true
+          type: string
       responses:
-        200:
-          description: "successful operation"
+        '200':
+          description: successful operation
           schema:
-            $ref: "#/definitions/Exposure"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Page not found"
+            type: object
+            properties:
+              Exposure:
+                type: string
+                enum:
+                  - unknown
+                  - positive
+                  - exposed
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: UUID not found
       security:
-      - api_key: []
-      - spotcorona_auth:
-        - "read:spotcorona_api"
-        
-  /Medical/Form:
+        - api_key: []
+        - spotcorona_auth:
+            - 'read:spotcorona_api'
+  
+  /medmap:
     post:
       tags:
-      - "Medical"
-      summary: "Add a set of answers from the medical questionnaire to the database"
-      description: ""
-      operationId: "reportQuestionnaireAnswers"
+        - Medical
+      summary: Add medical questionnaire data
+      description: ''
+      operationId: reportmedicaldata
       consumes:
-      - "application/json"
+        - application/json
       produces:
-      - "application/json"
+        - application/json
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Questionnaire answers object that needs to be added to the database"
-        required: true
-        schema:
-          $ref: "#/definitions/Medical"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - spotcorona_auth:
-        - "write:spotcorona_api"
-        - "read:spotcorona_api"
-  /Medical/Travel:
-    post:
-      tags:
-      - "Travel History"
-      summary: "Add a set of answers from the travel questionnaire to the database"
-      description: ""
-      operationId: "reportTravelAnswers"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Travel History answers object that needs to be added to the database"
-        required: true
-        schema:
-          $ref: "#/definitions/Travel"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - spotcorona_auth:
-        - "write:spotcorona_api"
-        - "read:spotcorona_api"
-  /user:
-    post:
-      tags:
-      - "User"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/login:
-    get:
-      tags:
-      - "User"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
+        - in: body
+          name: Medical Data Upload
+          description: Medical data that needs to be added for score calcuation
+          required: true
           schema:
-            type: "string"
-          headers:
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-        400:
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "User"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters: []
+            $ref: '#/definitions/MedicalMap/properties/medical_data'
+            
       responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
-      tags:
-      - "User"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
+        '201':
+          description: Medical Map Object created with med_uuid 
+        '400':
+          description: Invalid input
+      security:
+        - spotcorona_auth:
+            - 'write:spotcorona_api'
+            - 'read:spotcorona_api'
+            
+  /medmap/{med_uuid}:
     put:
       tags:
-      - "User"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
+        - Medical
+      summary: Add medical questionnaire data
+      description: ''
+      operationId: reporttraveldata
+      consumes:
+        - application/json
       produces:
-      - "application/xml"
-      - "application/json"
+        - application/json
       parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+        - name: med_uuid
+          in: path
+          description: ID of the Medical Data to update Travel Data to
+          required: true
+          type: string
+      
+        - in: body
+          name: Medical Data Upload
+          description: Travel data that needs to be added for score calcuation
+          required: true
+          schema:
+            $ref: '#/definitions/MedicalMap/properties/travel_data'
+            
       responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
-    delete:
+        '201':
+          description: Medical Map Object with med_uuid updated
+        '400':
+          description: Invalid input
+      security:
+        - spotcorona_auth:
+            - 'write:spotcorona_api'
+            - 'read:spotcorona_api'
+            
+  /medmap/result/{med_uuid}:
+    get:
       tags:
-      - "User"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
+        - Medical
+      summary: Returns the score and score color of the medical data associated with the queried med_uuid
+      description: Returns score and score color
+      operationId: getmedicalscore
       produces:
-      - "application/xml"
-      - "application/json"
+        - application/json
       parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
+        - name: med_uuid
+          in: path
+          description: ID of the Medical Data to calculate score
+          required: true
+          type: string
       responses:
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              score:
+                type: number
+              score_color:
+                type: string
+                
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: UUID not found
+      security:
+        - api_key: []
+        - spotcorona_auth:
+            - 'read:spotcorona_api'
+            
+  
+  # /user:
+  #   post:
+  #     tags:
+  #       - User
+  #     summary: Create user
+  #     description: This can only be done by the logged in user.
+  #     operationId: createUser
+  #     produces:
+  #       - application/xml
+  #       - application/json
+  #     parameters:
+  #       - in: body
+  #         name: body
+  #         description: Created user object
+  #         required: true
+  #         schema:
+  #           $ref: '#/definitions/User'
+  #     responses:
+  #       default:
+  #         description: successful operation
+  
+  # /user/login:
+  #   get:
+  #     tags:
+  #       - User
+  #     summary: Logs user into the system
+  #     description: ''
+  #     operationId: loginUser
+  #     produces:
+  #       - application/xml
+  #       - application/json
+  #     parameters:
+  #       - name: username
+  #         in: query
+  #         description: The user name for login
+  #         required: true
+  #         type: string
+  #       - name: password
+  #         in: query
+  #         description: The password for login in clear text
+  #         required: true
+  #         type: string
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         schema:
+  #           type: string
+  #         headers:
+  #           X-Rate-Limit:
+  #             type: integer
+  #             format: int32
+  #             description: calls per hour allowed by the user
+  #           X-Expires-After:
+  #             type: string
+  #             format: date-time
+  #             description: date in UTC when token expires
+  #       '400':
+  #         description: Invalid username/password supplied
+  # /user/logout:
+  #   get:
+  #     tags:
+  #       - User
+  #     summary: Logs out current logged in user session
+  #     description: ''
+  #     operationId: logoutUser
+  #     produces:
+  #       - application/xml
+  #       - application/json
+  #     parameters: []
+  #     responses:
+  #       default:
+  #         description: successful operation
+  # '/user/{username}':
+  #   get:
+  #     tags:
+  #       - User
+  #     summary: Get user by user name
+  #     description: ''
+  #     operationId: getUserByName
+  #     produces:
+  #       - application/xml
+  #       - application/json
+  #     parameters:
+  #       - name: username
+  #         in: path
+  #         description: 'The name that needs to be fetched. Use user1 for testing. '
+  #         required: true
+  #         type: string
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         schema:
+  #           $ref: '#/definitions/User'
+  #       '400':
+  #         description: Invalid username supplied
+  #       '404':
+  #         description: User not found
+  #   put:
+  #     tags:
+  #       - User
+  #     summary: Updated user
+  #     description: This can only be done by the logged in user.
+  #     operationId: updateUser
+  #     produces:
+  #       - application/xml
+  #       - application/json
+  #     parameters:
+  #       - name: username
+  #         in: path
+  #         description: name that need to be updated
+  #         required: true
+  #         type: string
+  #       - in: body
+  #         name: body
+  #         description: Updated user object
+  #         required: true
+  #         schema:
+  #           $ref: '#/definitions/User'
+  #     responses:
+  #       '400':
+  #         description: Invalid user supplied
+  #       '404':
+  #         description: User not found
+  #   delete:
+  #     tags:
+  #       - User
+  #     summary: Delete user
+  #     description: This can only be done by the logged in user.
+  #     operationId: deleteUser
+  #     produces:
+  #       - application/xml
+  #       - application/json
+  #     parameters:
+  #       - name: username
+  #         in: path
+  #         description: The name that needs to be deleted
+  #         required: true
+  #         type: string
+  #     responses:
+  #       '400':
+  #         description: Invalid username supplied
+  #       '404':
+  #         description: User not found
 securityDefinitions:
   spotcorona_auth:
-    type: "oauth2"
-    authorizationUrl: "http://spotcorona.swagger.io/oauth/dialog"
-    flow: "implicit"
+    type: oauth2
+    authorizationUrl: 'http://spotcorona.swagger.io/oauth/dialog'
+    flow: implicit
     scopes:
-      "write:spotcorona_api": "write data to the spotcorona api"
-      "read:spotcorona_api": "read data from the spotcorona api"
+      'write:spotcorona_api': write data to the spotcorona api
+      'read:spotcorona_api': read data from the spotcorona api
   api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-
+    type: apiKey
+    name: api_key
+    in: header
 definitions:
-  Status:
-    type: "string"
-    description: "Patient status according to app"
-    enum:
-      - "unknown"
-      - "exposed"
-      - "positive"
-  Exposure:
-    type: "object"
-    description: "Defines exposure of a person to coronavirus"
+  CoronaApp:
+    type: object
     properties:
-      status:
-        $ref: "#/definitions/Status"
-      degree:
-        type: "integer"
-        description: "Degree -1 means unknown status of exposure.\nDegree 0 means confirmed positve.\nDegree 1 means exposure to degree 0 person.\nDegree 2 means exposure to degree 1 person, and so on "
-    xml:
-      name: "Exposure"
-  Point:
-    type: "object"
-    properties:
+      uuid:
+        type: string
       timeslot:
-        type: "string"
+        type: string
         format: date-time
-      lat:
-        type: "number"
+      degree:
+        type: number
+        format: integer
+        minimum: -1
+        maximum: 1
+      latitude:
+        type: number
         format: float
-      long:
-        type: "number"
+      longitude:
+        type: number
         format: float
-      status:
-        $ref: "#/definitions/Status"
     xml:
-      name: "Points"
-  LocationHistory:
-    type: "object"
-    description: "This is the model used to report a person's location history to the backend"
-    required:
-    - "user_location_id"
-    - "location_history"
+      name: Location Data
+  MedicalMap:
+    type: object
     properties:
-      user_location_id:
-        type: "string"
-        format: uuid
-        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
-      points:
-        type: "array"
-        items:
-          $ref: "#/definitions/Point"
-    xml:
-      name: "points"
- 
-  OneHotEncoding:
-    type: "array"
-    items:
-      type: "integer"
+      medical_data:
+        type: object
+        properties:
+          med_uuid:
+            type: string
+          age:
+            type: number
+            format: integer
+          height:
+            type: number
+            format: integer
+          weight:
+            type: number
+            format: integer
+          diabetes:
+            type: boolean
+          kidney:
+            type: boolean
+          heart:
+            type: boolean
+          lungs:
+            type: boolean
+          stroke:
+            type: boolean
+          hypertension:
+            type: boolean
+          hiv:
+            type: boolean
+          transplant:
+            type: boolean
+          fever:
+            type: number
+            format: integer
+            minimum: 0
+            maximum: 4
+          cough:
+            type: number
+            format: integer
+            minimum: 0
+            maximum: 4
+          breathlessness:
+            type: boolean
+          fatigue:
+            type: boolean
+          joint_pain:
+            type: boolean
+          loss_of_taste_and_smell:
+            type: boolean
+          sore_throat:
+            type: boolean
+          nasal_congestion:
+            type: boolean
+          headache:
+            type: boolean
+          chills:
+            type: boolean
+          nausea_or_vomiting:
+            type: boolean
+          diarrhea:
+            type: boolean
+          conjunctival_congestion:
+            type: boolean
+          symptoms_improvement:
+            type: number
+            format: integer
+            minimum: 0
+            maximum: 3
+            
+      travel_data:
+        type: "object"
+        properties:
+          domestic_flight:
+            type: boolean
+          domestic_train:
+            type: boolean
+          domestic_auto:
+            type: boolean
+          domestic_cab:
+            type: boolean
+          current_state:
+            type: string
+            enum:
+              - ANDAMAN AND NICOBAR ISLANDS
+              - ANDHRA PRADESH
+              - ARUNACHAL PRADESH
+              - ASSAM
+              - BIHAR
+              - CHANDIGARH
+              - CHHATTISGARH
+              - Dadra and Nagar Haveli and Daman and Diu
+              - DELHI
+              - GOA
+              - GUJARAT
+              - HARYANA
+              - HIMACHAL PRADESH
+              - JAMMU AND KASHMIR
+              - JHARKHAND
+              - KARNATAKA
+              - KERALA
+              - LADAKH
+              - Lakshadweep
+              - MADHYA PRADESH
+              - MAHARASHTRA
+              - MANIPUR
+              - Meghalaya
+              - MIZORAM
+              - Nagaland
+              - ODISHA
+              - PUDUCHERRY
+              - PUNJAB
+              - RAJASTHAN
+              - Sikkim
+              - TAMIL NADU
+              - TELANGANA
+              - Tripura
+              - UTTAR PRADESH
+              - UTTARAKHAND
+              - WEST BENGAL
+          domestic_airport_from:
+            type: string
+            enum:
+              - Agartala
+              - Agra
+              - Ahmedabad
+              - Aizawl
+              - Ajmer
+              - Akola
+              - Allahabad
+              - Along
+              - Ambala
+              - Ambikapur
+              - Amravati
+              - Amreli
+              - Amritsar
+              - Arakkonam
+              - Aurangabad
+              - Awantipora
+              - Balangir
+              - Balurghat
+              - Bangalore
+              - Baramati
+              - Bargarh
+              - Baripada
+              - Barmer
+              - Barrackpore
+              - Bathinda
+              - Behala
+              - Belgaum
+              - Bellary
+              - Berhampur
+              - Bhagalpur
+              - Bhavnagar
+              - Bhawanipatna
+              - Bhiwani
+              - Bhopal
+              - Bhubaneswar
+              - Bhuj
+              - Bidar
+              - Bihta
+              - Bikaner
+              - Bilaspur
+              - Bokaro
+              - Campbell Bay
+              - Car Nicobar
+              - Chabua
+              - Chakulia
+              - Chandigarh
+              - Chandrapur
+              - Chennai
+              - Chhindwara
+              - Chitradurga
+              - Chushul
+              - Coimbatore
+              - Cooch Behar
+              - Cuttack
+              - Dabolim
+              - Daman
+              - Daporijo
+              - Darbhanga
+              - Daulat Beg Oldi
+              - Dehradun
+              - Delhi NCR
+              - Demchok
+              - Dhanbad
+              - Dhenkanal
+              - Dhubri
+              - Dhule
+              - Dibrugarh
+              - Diglipur
+              - Dimapur
+              - Diu
+              - Doom Dooma
+              - Dumka
+              - Durgapur Asansol
+              - Ganganagar
+              - Gangtok
+              - Gaya
+              - Ghaziabad
+              - Gondia
+              - Gorakhpur
+              - Gurugram
+              - Guwahati
+              - Gwalior
+              - Halwara
+              - Hasimara
+              - Hirakud/Sambalpur
+              - Hisar
+              - Hubli
+              - Hyderabad
+              - Impha
+              - Indore
+              - Jabalpur
+              - Jagdalpur
+              - Jaipur
+              - Jaisalmer
+              - Jalandhar
+              - Jalgaon
+              - Jammu
+              - Jamnagar
+              - Jamshedpur
+              - Jashpur
+              - Jeypore
+              - Jhalawar
+              - Jharsuguda
+              - Jodhpur
+              - Jogbani
+              - Jorhat
+              - Kadapa
+              - Kailashahar
+              - Kalaburagi
+              - Kalyan
+              - Kamalpur
+              - Kanchrapara
+              - Kandla
+              - Kangra
+              - Kannur
+              - Kanpur
+              - Karad
+              - Kargil
+              - Karnal
+              - Keshod
+              - Khajuraho
+              - Khandwa
+              - Kharagpur
+              - Khowai
+              - Kochi
+              - Kolhapur
+              - Kolkata
+              - Kollam
+              - Korba
+              - Kota
+              - Kozhikode
+              - Kullu
+              - Kurnool
+              - Lakshadweep
+              - Latur
+              - Leh
+              - Lucknow
+              - Ludhiana
+              - Madurai
+              - Malda
+              - Mangalore
+              - Mumbai
+              - Munger
+              - Muzaffarpur
+              - Mysore
+              - Nagarjuna Sagar
+              - Nagpur
+              - Naliya
+              - Nanded
+              - Narnaul
+              - Nashik
+              - North Lakhimpur
+              - Nuapada
+              - Osmanabad
+              - Palanpur
+              - Panagarh
+              - Panchkula
+              - Pantnagar
+              - Pasighat
+              - Pathankot
+              - Patiala
+              - Patna
+              - Phalodi
+              - Phaltan
+              - Pithoragarh
+              - Poonch
+              - Porbandar
+              - Port Blair
+              - Puducherry
+              - Pune
+              - Purnea
+              - Purulia
+              - Raigarh
+              - Raipur
+              - Rairangpur
+              - Rajahmundry
+              - Rajkot
+              - Rajouri
+              - Ramanathapuram
+              - Ranchi
+              - Ratnagiri
+              - Raxaul
+              - Rayagada
+              - Sagar
+              - Saharanpur
+              - Salem
+              - Shella
+              - Shillong
+              - Shimla
+              - Shirdi
+              - Siachen
+              - Silchar
+              - Siliguri
+              - Sindhudurg
+              - Sirsa
+              - Solapur
+              - Srinagar
+              - Surat
+              - Suratgarh
+              - Tezpur
+              - Tezu
+              - Thanjavur
+              - Thiruvananthapuram
+              - Thoise
+              - Thoothukudi
+              - Tiruchirapalli
+              - Tirupati
+              - Tura
+              - Udaipur
+              - Udhampur
+              - Ujjain
+              - Vadodara
+              - Varanasi
+              - Vellore
+              - Vijayawada
+              - Vijaynagar
+              - Visakhapatnam
+              - Warangal
+              - Yavatmal
+              - Ziro
+          domestic_airport_to:
+            type: string
+            enum:
+              - Agartala
+              - Agra
+              - Ahmedabad
+              - Aizawl
+              - Ajmer
+              - Akola
+              - Allahabad
+              - Along
+              - Ambala
+              - Ambikapur
+              - Amravati
+              - Amreli
+              - Amritsar
+              - Arakkonam
+              - Aurangabad
+              - Awantipora
+              - Balangir
+              - Balurghat
+              - Bangalore
+              - Baramati
+              - Bargarh
+              - Baripada
+              - Barmer
+              - Barrackpore
+              - Bathinda
+              - Behala
+              - Belgaum
+              - Bellary
+              - Berhampur
+              - Bhagalpur
+              - Bhavnagar
+              - Bhawanipatna
+              - Bhiwani
+              - Bhopal
+              - Bhubaneswar
+              - Bhuj
+              - Bidar
+              - Bihta
+              - Bikaner
+              - Bilaspur
+              - Bokaro
+              - Campbell Bay
+              - Car Nicobar
+              - Chabua
+              - Chakulia
+              - Chandigarh
+              - Chandrapur
+              - Chennai
+              - Chhindwara
+              - Chitradurga
+              - Chushul
+              - Coimbatore
+              - Cooch Behar
+              - Cuttack
+              - Dabolim
+              - Daman
+              - Daporijo
+              - Darbhanga
+              - Daulat Beg Oldi
+              - Dehradun
+              - Delhi NCR
+              - Demchok
+              - Dhanbad
+              - Dhenkanal
+              - Dhubri
+              - Dhule
+              - Dibrugarh
+              - Diglipur
+              - Dimapur
+              - Diu
+              - Doom Dooma
+              - Dumka
+              - Durgapur Asansol
+              - Ganganagar
+              - Gangtok
+              - Gaya
+              - Ghaziabad
+              - Gondia
+              - Gorakhpur
+              - Gurugram
+              - Guwahati
+              - Gwalior
+              - Halwara
+              - Hasimara
+              - Hirakud/Sambalpur
+              - Hisar
+              - Hubli
+              - Hyderabad
+              - Impha
+              - Indore
+              - Jabalpur
+              - Jagdalpur
+              - Jaipur
+              - Jaisalmer
+              - Jalandhar
+              - Jalgaon
+              - Jammu
+              - Jamnagar
+              - Jamshedpur
+              - Jashpur
+              - Jeypore
+              - Jhalawar
+              - Jharsuguda
+              - Jodhpur
+              - Jogbani
+              - Jorhat
+              - Kadapa
+              - Kailashahar
+              - Kalaburagi
+              - Kalyan
+              - Kamalpur
+              - Kanchrapara
+              - Kandla
+              - Kangra
+              - Kannur
+              - Kanpur
+              - Karad
+              - Kargil
+              - Karnal
+              - Keshod
+              - Khajuraho
+              - Khandwa
+              - Kharagpur
+              - Khowai
+              - Kochi
+              - Kolhapur
+              - Kolkata
+              - Kollam
+              - Korba
+              - Kota
+              - Kozhikode
+              - Kullu
+              - Kurnool
+              - Lakshadweep
+              - Latur
+              - Leh
+              - Lucknow
+              - Ludhiana
+              - Madurai
+              - Malda
+              - Mangalore
+              - Mumbai
+              - Munger
+              - Muzaffarpur
+              - Mysore
+              - Nagarjuna Sagar
+              - Nagpur
+              - Naliya
+              - Nanded
+              - Narnaul
+              - Nashik
+              - North Lakhimpur
+              - Nuapada
+              - Osmanabad
+              - Palanpur
+              - Panagarh
+              - Panchkula
+              - Pantnagar
+              - Pasighat
+              - Pathankot
+              - Patiala
+              - Patna
+              - Phalodi
+              - Phaltan
+              - Pithoragarh
+              - Poonch
+              - Porbandar
+              - Port Blair
+              - Puducherry
+              - Pune
+              - Purnea
+              - Purulia
+              - Raigarh
+              - Raipur
+              - Rairangpur
+              - Rajahmundry
+              - Rajkot
+              - Rajouri
+              - Ramanathapuram
+              - Ranchi
+              - Ratnagiri
+              - Raxaul
+              - Rayagada
+              - Sagar
+              - Saharanpur
+              - Salem
+              - Shella
+              - Shillong
+              - Shimla
+              - Shirdi
+              - Siachen
+              - Silchar
+              - Siliguri
+              - Sindhudurg
+              - Sirsa
+              - Solapur
+              - Srinagar
+              - Surat
+              - Suratgarh
+              - Tezpur
+              - Tezu
+              - Thanjavur
+              - Thiruvananthapuram
+              - Thoise
+              - Thoothukudi
+              - Tiruchirapalli
+              - Tirupati
+              - Tura
+              - Udaipur
+              - Udhampur
+              - Ujjain
+              - Vadodara
+              - Varanasi
+              - Vellore
+              - Vijayawada
+              - Vijaynagar
+              - Visakhapatnam
+              - Warangal
+              - Yavatmal
+              - Ziro
+          international_mode:
+            type: boolean
+          country_travelled:
+            type: string
+            enum:
+              - USA
+              - Italy
+              - China
+              - Spain
+              - Germany
+              - France
+              - Iran
+              - UK
+              - Switzerland
+              - Netherlands
+              - Belgium
+              - S. Korea
+              - Turkey
+              - Austria
+              - Canada
+              - Portugal
+              - Israel
+              - Norway
+              - Brazil
+              - Australia
+              - Sweden
+              - Czechia
+              - Ireland
+              - Malaysia
+              - Denmark 
+              - Chile
+              - Luxembourg
+              - Ecuador
+              - Poland
+              - Japan
+              - Romania
+              - Pakistan
+              - Russia
+              - Thailand
+              - Philippines
+              - SaudiArabia
+              - Indonesia
+              - South Africa
+              - Finland
+              - Greece
+              - India
+              - Iceland
+              - Mexico
+              - Panama
+              - Dominican Republic
+              - Peru
+              - Singapore
+              - Argentina
+              - Serbia
+              - Slovenia
+              - Estonia
+              - Croatia
+              - Colombia
+              - Hong Kong
+              - Qatar
+              - Egypt
+              - New Zealand
+              - UAE
+              - Iraq
+              - Bahrain
+              - Algeria
+              - Lithuania
+              - Ukraine
+              - Hungary
+              - Lebanon
+              - Armenia
+              - Latvia 
+              - Bulgaria
+              - Bosnia and Herzegovina
+              - Andorra
+              - Costa Rica
+              - Slovakia 
+              - Tunisia
+              - Uruguay
+              - Taiwan
+              - Kazakhstan
+              - Moldova
+              - North Macedonia
+              - Jordan
+              - Kuwait 
+              - San Marino
+              - Burkina Faso
+              - Cyprus
+              - Albania
+              - Azerbaijan
+              - Vietnam 
+              - Réunion 
+              - Oman 
+              - Ivory Coast
+              - Faeroe Islands 
+              - Ghana
+              - Malta 
+              - Uzbekistan
+              - Senegal 
+              - Cameroon
+              - Cuba
+              - Honduras
+              - Brunei
+              - Afghanistan
+              - Sri Lanka
+              - Venezuela
+              - Nigeria
+              - Mauritius
+              - Palestine
+              - Channel Islands
+              - Guadeloupe
+              - Cambodia 
+              - Georgia 
+              - Bolivia
+              - Belarus 
+              - Martinique
+              - Montenegro
+              - Kyrgyzstan 
+              - DRC
+              - Trinidad and Tobago
+              - Rwanda 
+              - Gibraltar 
+              - Paraguay
+              - Mayotte 
+              - Liechtenstein 
+              - Aruba 
+              - Bangladesh
+              - Monaco
+              - French Guiana 
+              - Kenya
+              - Isle of Man 
+              - Madagascar 
+              - Macao 
+              - Guatemala
+              - Barbados 
+              - Uganda 
+              - Jamaica
+              - Togo
+              - El Salvador 
+              - French Polynesia 
+              - Zambia 
+              - Bermuda 
+              - Ethiopia 
+              - Congo 
+              - Mali
+              - Niger
+              - Djibouti 
+              - Maldives 
+              - Guinea 
+              - Haiti 
+              - New Caledonia 
+              - Bahamas 
+              - Tanzania 
+              - Cayman Islands
+              - Equatorial Guinea 
+              - Eritrea 
+              - Mongolia 
+              - Dominica 
+              - Namibia 
+              - Saint Martin 
+              - Greenland 
+              - Myanmar 
+              - Syria
+              - Grenada 
+              - Saint Lucia 
+              - Eswatini 
+              - Curaçao
+              - Guyana
+              - Laos 
+              - Libya 
+              - Mozambique 
+              - Seychelles 
+              - Suriname 
+              - Angola
+              - Gabon
+              - Zimbabwe
+              - Antigua and Barbuda 
+              - Cabo Verde
+              - Sudan
+              - Benin 
+              - Vatican City 
+              - Sint Maarten 
+              - Nepal 
+              - Fiji 
+              - Mauritania 
+              - Montserrat 
+              - St. Barth 
+              - Gambia
+              - Nicaragua
+              - Bhutan
+              - Turks and Caicos
+              - CAR
+              - Chad
+              - Liberia
+              - Somalia
+              - MS Zaandam
+              - Anguilla
+              - Belize
+              - British Virgin Islands
+              - Guinea    -Bissau 
+              - Saint Kitts and Nevis
+              - Papua New Guinea
+              - St. Vincent Grenadines
 
-    description: "An OneHotEncoded array with the  value 1 for the option selected or zero ([0,0,0,0,0,0] by default or when clicked No)"
-
-  Multioptions:
-    type: "array"
-    items:
-      type: "integer"
-
-    description: "An array with each value 1 for each option or zero ([0,0,0,0,0,0,0] by default or when clicked non of the above)"
-    
-  Questions_Medical:
-    type: "object"
-    properties:
-      Gender:
-        type: "string"
-        format: string
-      Age:
-        type: "number"
-        format: int
-      Height:
-        type: "number"
-        format: int
-      Weight:
-        type: "number"
-        format: int
-      Smoking:
-        type: "number"
-        format: int
-      Immunity:
-        type: "number"
-        format: int
-      Prev_Conditions:
-        $ref: "#/definitions/Multioptions"
-      Cough:
-        $ref: "#/definitions/OneHotEncoding"
-      Breathless:
-        $ref: "#/definitions/OneHotEncoding"
-      Sore Throat:
-        type: "number"
-        format: int
-      Nasal Congestion:
-        type: "number"
-        format: int
-      Loss of Taste/Smell:
-        type: "number"
-        format: int
-      Body Pain:
-        type: "number"
-        format: int 
-      Fatigue:
-        type: "number"
-        format: int
-      Symptoms:
-        $ref: "#/definitions/Multioptions"
-      Fever_time: 
-        type: "number"
-        format: int
-      Cough_time: 
-        type: "number"
-        format: int
-      Headache_time: 
-        type: "number"
-        format: int
-      Development: 
-        $ref: "#/definitions/OneHotEncoding"
-
-    xml:
-      name: "questions"
-      
-  Medical:
-    type: "object"
-    description: "This is the model used to report a person's medical response to the backend"
-    required:
-    - "user_location_id"
-    - "questionnaire"
-    properties:
-      user_location_id:
-        type: "string"
-        format: uuid
-        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
-      questionnaire:
-        type: "array"
-        items:
-          $ref: "#/definitions/Questions_Medical"
-    xml:
-      name: "questions"
-      
-  Questions_Travel:
-    type: "object"
-    properties:
-      International_travel:
-        type: "integer"
-        format: int
-      Domestic_travel:
-        type: "integer"
-        format: int
-      HomeTown:
-        type: "string"
-        format: string
-      Current Location:
-        type: "string"
-        format: string
-      Transport:
-        $ref: "#/definitions/Multioptions"
-
-
-    xml:
-      name: "questions"
-      
-  Travel:
-    type: "object"
-    description: "This is the model used to report a person's medical response to the backend"
-    required:
-    - "user_location_id"
-    - "questionnaire"
-    properties:
-      user_location_id:
-        type: "string"
-        format: uuid
-        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
-      questionnaire:
-        type: "array"
-        items:
-          $ref: "#/definitions/Questions_Travel"
-    xml:
-      name: "questions"
-
-  User:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
-      password:
-        type: "string"
-      phone:
-        type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string" 
+  # User:
+  #   type: object
+  #   properties:
+  #     id:
+  #       type: integer
+  #       format: int64
+  #     username:
+  #       type: string
+  #     firstName:
+  #       type: string
+  #     lastName:
+  #       type: string
+  #     email:
+  #       type: string
+  #     password:
+  #       type: string
+  #     phone:
+  #       type: string
+  #     userStatus:
+  #       type: integer
+  #       format: int32
+  #       description: User Status
+  #   xml:
+  #     name: User
+  # ApiResponse:
+  #   type: object
+  #   properties:
+  #     code:
+  #       type: integer
+  #       format: int32
+  #     type:
+  #       type: string
+  #     message:
+  #       type: string

@@ -1,0 +1,544 @@
+swagger: "2.0"
+info:
+  description: "This is a sample spotcorona server"
+  version: "1.0.0"
+  title: "SpotCorona api"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@spotcorona.org"
+  license:
+    name: "GPLv3"
+    url: "https://www.gnu.org/licenses/gpl-3.0.en.html"
+host: "api.spotcorona.org"
+basePath: "/v1"
+tags:
+- name: "Intersection"
+  description: "Everything about Intersection Calculator Endpoint"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "Medical"
+  description: "Everything about medical hisory endpoint"
+- name: "Travel History"
+  description: "Everything related to travel history"
+  externalDocs:
+    description: "Find out more about our group"
+    url: "http://swagger.io"
+- name: "User"
+  description: "Everything related to user's personal details"
+  externalDocs:
+    description: "Find out more about our group"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /report:
+    post:
+      tags:
+      - "Intersection"
+      summary: "Add a set of location history points to the database"
+      description: ""
+      operationId: "reportLocation"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Location history object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/LocationHistory"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - spotcorona_auth:
+        - "write:spotcorona_api"
+        - "read:spotcorona_api"
+  /map/{status}:
+    get:
+      tags:
+      - "Intersection"
+      summary: "Get last known coordinates of all users of a particular status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findUsersByStatus"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "path"
+        required: true
+        type: "string"
+        description: "Patient status to be queried"
+        enum:
+          - "unknown"
+          - "exposed"
+          - "positive"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Point"
+        400:
+          description: "Invalid status value"
+      security:
+      - spotcorona_auth:
+        - "read:spotcorona_api"
+  /amIExposed/{user_location_id}:
+    get:
+      tags:
+      - "Intersection"
+      summary: "Find if the user with the queried id is exposed"
+      description: "Returns status and degree of exposure"
+      operationId: "getAmIExposedById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_location_id"
+        in: "path"
+        description: "ID of user to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Exposure"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Page not found"
+      security:
+      - api_key: []
+      - spotcorona_auth:
+        - "read:spotcorona_api"
+        
+  /Medical/Form:
+    post:
+      tags:
+      - "Medical"
+      summary: "Add a set of answers from the medical questionnaire to the database"
+      description: ""
+      operationId: "reportQuestionnaireAnswers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Questionnaire answers object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Medical"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - spotcorona_auth:
+        - "write:spotcorona_api"
+        - "read:spotcorona_api"
+  /Medical/Travel:
+    post:
+      tags:
+      - "Travel History"
+      summary: "Add a set of answers from the travel questionnaire to the database"
+      description: ""
+      operationId: "reportTravelAnswers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Travel History answers object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Travel"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - spotcorona_auth:
+        - "write:spotcorona_api"
+        - "read:spotcorona_api"
+  /user:
+    post:
+      tags:
+      - "User"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+  /user/login:
+    get:
+      tags:
+      - "User"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+          headers:
+            X-Rate-Limit:
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+        400:
+          description: "Invalid username/password supplied"
+  /user/logout:
+    get:
+      tags:
+      - "User"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /user/{username}:
+    get:
+      tags:
+      - "User"
+      summary: "Get user by user name"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+    put:
+      tags:
+      - "User"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+    delete:
+      tags:
+      - "User"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+securityDefinitions:
+  spotcorona_auth:
+    type: "oauth2"
+    authorizationUrl: "http://spotcorona.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      "write:spotcorona_api": "write data to the spotcorona api"
+      "read:spotcorona_api": "read data from the spotcorona api"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+
+definitions:
+  Status:
+    type: "string"
+    description: "Patient status according to app"
+    enum:
+      - "unknown"
+      - "exposed"
+      - "positive"
+  Exposure:
+    type: "object"
+    description: "Defines exposure of a person to coronavirus"
+    properties:
+      status:
+        $ref: "#/definitions/Status"
+      degree:
+        type: "integer"
+        description: "Degree -1 means unknown status of exposure.\nDegree 0 means confirmed positve.\nDegree 1 means exposure to degree 0 person.\nDegree 2 means exposure to degree 1 person, and so on "
+    xml:
+      name: "Exposure"
+  Point:
+    type: "object"
+    properties:
+      timeslot:
+        type: "string"
+        format: date-time
+      lat:
+        type: "number"
+        format: float
+      long:
+        type: "number"
+        format: float
+      status:
+        $ref: "#/definitions/Status"
+    xml:
+      name: "Points"
+  LocationHistory:
+    type: "object"
+    description: "This is the model used to report a person's location history to the backend"
+    required:
+    - "user_location_id"
+    - "location_history"
+    properties:
+      user_location_id:
+        type: "string"
+        format: uuid
+        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
+      points:
+        type: "array"
+        items:
+          $ref: "#/definitions/Point"
+    xml:
+      name: "points"
+ 
+  OneHotEncoding:
+    type: "array"
+    items:
+      type: "integer"
+
+    description: "An OneHotEncoded array with the  value 1 for the option selected or zero ([0,0,0,0,0,0] by default or when clicked No)"
+
+  Multioptions:
+    type: "array"
+    items:
+      type: "integer"
+
+    description: "An array with each value 1 for each option or zero ([0,0,0,0,0,0,0] by default or when clicked non of the above)"
+    
+  Questions_Medical:
+    type: "object"
+    properties:
+      Gender:
+        type: "string"
+        format: string
+      Age:
+        type: "number"
+        format: int
+      Height:
+        type: "number"
+        format: int
+      Weight:
+        type: "number"
+        format: int
+      Smoking:
+        type: "number"
+        format: int
+      Immunity:
+        type: "number"
+        format: int
+      Prev_Conditions:
+        $ref: "#/definitions/Multioptions"
+      Cough:
+        $ref: "#/definitions/OneHotEncoding"
+      Breathless:
+        $ref: "#/definitions/OneHotEncoding"
+      Sore Throat:
+        type: "number"
+        format: int
+      Nasal Congestion:
+        type: "number"
+        format: int
+      Loss of Taste/Smell:
+        type: "number"
+        format: int
+      Body Pain:
+        type: "number"
+        format: int 
+      Fatigue:
+        type: "number"
+        format: int
+      Symptoms:
+        $ref: "#/definitions/Multioptions"
+      Fever_time: 
+        type: "number"
+        format: int
+      Cough_time: 
+        type: "number"
+        format: int
+      Headache_time: 
+        type: "number"
+        format: int
+      Development: 
+        $ref: "#/definitions/OneHotEncoding"
+
+    xml:
+      name: "questions"
+      
+  Medical:
+    type: "object"
+    description: "This is the model used to report a person's medical response to the backend"
+    required:
+    - "user_location_id"
+    - "questionnaire"
+    properties:
+      user_location_id:
+        type: "string"
+        format: uuid
+        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
+      questionnaire:
+        type: "array"
+        items:
+          $ref: "#/definitions/Questions_Medical"
+    xml:
+      name: "questions"
+      
+  Questions_Travel:
+    type: "object"
+    properties:
+      International_travel:
+        type: "integer"
+        format: int
+      Domestic_travel:
+        type: "integer"
+        format: int
+      HomeTown:
+        type: "string"
+        format: string
+      Current Location:
+        type: "string"
+        format: string
+      Transport:
+        $ref: "#/definitions/Multioptions"
+
+
+    xml:
+      name: "questions"
+      
+  Travel:
+    type: "object"
+    description: "This is the model used to report a person's medical response to the backend"
+    required:
+    - "user_location_id"
+    - "questionnaire"
+    properties:
+      user_location_id:
+        type: "string"
+        format: uuid
+        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
+      questionnaire:
+        type: "array"
+        items:
+          $ref: "#/definitions/Questions_Travel"
+    xml:
+      name: "questions"
+
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+      userStatus:
+        type: "integer"
+        format: "int32"
+        description: "User Status"
+    xml:
+      name: "User"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string" 
